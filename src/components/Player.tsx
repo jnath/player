@@ -14,16 +14,24 @@ const options = { /* Add renderer options here */ }
 
 
 interface PlayerState {
+    pause: boolean;
 }
 
 interface PlayerProps extends React.HTMLProps<HTMLCanvasElement>{
-    play:boolean,
-    url:string
+    // play:boolean;
+    // url:string;
+    onPositionChanged?: (pos: number) => void;
+    onBuffering?: (pos: number) => void;
+    onPlaying?: () => void;
+    onPaused?: () => void;
+    onStopped?: () => void;
+    onEndReached?: () => void;
+
 }
 
 
 export default class Player extends Component<PlayerProps, PlayerState> {
-
+    
     style: any = {
       position: 'absolute',
       width:'100%',
@@ -35,18 +43,60 @@ export default class Player extends Component<PlayerProps, PlayerState> {
 
     constructor(props:PlayerProps) {
         super(props);
-        this.state = {};
-
+        this.state = {
+            pause:false
+        };
     }
-
+     
+    
     componentDidMount() {
         renderer.bind(document.getElementById("playerCanvas"), vlc, options);
+        console.log(vlc);
+        vlc.onPositionChanged = this.props.onPositionChanged;
+        vlc.onBuffering = this.props.onBuffering;
+        vlc.onPlaying = () => {
+            this.setState({pause: false});
+            this.props.onPlaying();
+        }
+        vlc.onPaused = () => {
+            this.setState({pause: true});
+            this.props.onPaused();
+        }
+        vlc.onStopped = () => {
+            this.setState({pause: false});
+            this.props.onStopped();
+        }
+        vlc.onEndReached = ()=>{
+            this.props.onPositionChanged(1);
+            this.props.onEndReached()
+            console.log('onEndReached');
+        }
+    }
+
+    tooglePlayPause(url:string){
+        if(!vlc.playing && !this.state.pause){
+            vlc.play(url);
+        }else{
+            vlc.togglePause();
+        }
+    }
+
+    get mute(){ return vlc.mute; }
+    set mute(value:boolean){
+        vlc.mute = value;
+    }
+
+    get volume(){ return vlc.volume; }
+    set volume(value: number){
+        vlc.volume = value;
+    }
+
+    get position(){ return vlc.volume; }
+    set position(value: number){
+        vlc.position = value;
     }
 
     render() {
-        if(this.props.url && this.props.play){
-            vlc.play(this.props.url);
-        }
         return (
             <canvas id="playerCanvas" style={this.style} />
         )

@@ -11,10 +11,10 @@ interface OverlayControlesState{
 }
 
 interface OverlayControlesProps extends React.HTMLProps<HTMLDivElement>{
-  displayState:DisplayState
+  displayState:OverlayControlesDisplayState
 }
 
-export enum DisplayState{
+export enum OverlayControlesDisplayState{
   PLAY,
   PAUSE
 }
@@ -40,26 +40,13 @@ export default class OverlayControles extends Component<OverlayControlesProps, O
   }
 
   render() {
-    let playStyle:any = Object.assign({}, this.style);
-    let pauseStyle:any = Object.assign({}, this.style);
-    switch(this.props.displayState){
-      case DisplayState.PLAY:
-        playStyle.opacity = playStyle.opacity; 
-        pauseStyle.opacity = 0; 
-      break;
-      case DisplayState.PAUSE:
-        playStyle.opacity = 0; 
-        pauseStyle.opacity = pauseStyle.opacity; 
-      break;
-      default:
-        playStyle.opacity = 0; 
-        pauseStyle.opacity = 0; 
-      break;
-    }
     return (
       <div onClick={(e)=>this.props.onClick(e)} >
-        <PlayCircleFilled style={playStyle} />
-        <PauseCircleFilled style={pauseStyle} />
+        {this.props.displayState === OverlayControlesDisplayState.PLAY ?
+          <PlayCircleFilled style={this.style} />
+          :
+          <PauseCircleFilled style={this.style} />
+        }
       </div>
     );
   }

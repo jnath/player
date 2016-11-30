@@ -10,6 +10,7 @@ import Slider from 'material-ui/Slider';
 
 
 interface VolumeState{
+  over: boolean;
 }
 
 interface VolumeProps extends React.HTMLProps<HTMLDivElement>{
@@ -31,12 +32,27 @@ export default class Volume extends Component<VolumeProps, VolumeState> {
 
   private slider: Slider;
 
+  private timeout: NodeJS.Timer;
+
   constructor(props) {
     super(props);
 
     this.state = {
+      over:false
     };
   
+  }
+
+  mouseOver(){
+    // clearTimeout(this.timeout);
+    // this.timeout = setTimeout(()=>{
+    //   this.setState({over: false});
+    // }, 3000);
+    this.setState({over: true})
+  }
+
+  mouseLeave(){
+    this.setState({over: false})
   }
 
   render() {
@@ -54,19 +70,32 @@ export default class Volume extends Component<VolumeProps, VolumeState> {
         VolumeIco = VolumeDown;
       }
     }
+    
+    let sliderWidth: string = this.state.over ? '100px' : '0px';
 
     return (
-      <div style={this.props.style} >
+      <div 
+        style={this.props.style} 
+        onMouseOut={()=>this.mouseOver()}
+        onMouseLeave={()=>this.mouseLeave()}
+        >
         <VolumeIco 
           style={{display:'inline-block'}}
           onClick={()=>this.props.onButtonClick()}
+          
           />
         <Slider
           ref={(slider) => this.slider = slider}
           value={this.props.volume}
           onChange={(e, value) => this.props.onChange(value)}
-          style={{display:'inline-block', width:'100px', height:'24px'}} 
-          sliderStyle={{marginTop:'3px', marginBottom:"0px", marginLeft:'6px'}} />
+          style={{
+            display: 'inline-block', 
+            width: sliderWidth, 
+            height: '24px',
+            transition: 'width 1s linear',
+            overflow: 'auto'
+          }} 
+          sliderStyle={{marginTop:'3px', marginBottom:"0px", marginLeft:'6px', width:'calc(100% - 23px)'}} />
       </div>
     );
   }

@@ -69,7 +69,6 @@ export default class Player extends Component<PlayerProps, PlayerState> {
         vlc.onEndReached = ()=>{
             this.props.onPositionChanged(1);
             this.props.onEndReached()
-            console.log('onEndReached');
         }
     }
 

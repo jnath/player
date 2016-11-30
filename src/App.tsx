@@ -19,8 +19,10 @@ import Slider from 'material-ui/Slider';
 
 
 interface MainState{
-  uiShown?:boolean;
+  uiShownToolBox?:boolean;
+  uiShownControle?:boolean;
   playing?:boolean;
+  ended?:boolean;
   currentUrl?: string;
   position?: number;
   buffer?: number;
@@ -40,7 +42,8 @@ export default class Main extends Component<any, MainState> {
     }
   };
 
-  private hoverTimeout: NodeJS.Timer = null;
+  private tooleBoxTimeout: NodeJS.Timer = null;
+  private controlesTimeout: NodeJS.Timer = null;
 
   private player: Player;
 
@@ -48,29 +51,41 @@ export default class Main extends Component<any, MainState> {
     super(props);
 
     this.state = {
-      uiShown: true,
+      uiShownToolBox: true,
       playing: false,
+      ended: false,
       currentUrl: 'file:///Users/jnath2/Movies/trailer_1080p.mov',
       position: 0,
       buffer:0,
       volume:1,
       mute:false
     };
-    this.hoverTimeout = null;
+    this.controlesTimeout = null;
   }
 
-  hover(){
-    if(this.hoverTimeout){
-      clearTimeout(this.hoverTimeout);
+  mouseMove(){
+    if(this.controlesTimeout){
+      clearTimeout(this.controlesTimeout);
     }
-    this.state.uiShown || this.setState({uiShown: true});
-    // this.hoverTimeout = setTimeout(() => {
-    //   this.setState({uiShown: false})
-    // }, 5000)
+    this.state.uiShownControle || this.setState({uiShownControle: true});
+    this.controlesTimeout = setTimeout(() => {
+      this.setState({uiShownControle: false})
+    }, 10000);
+
+    if(this.tooleBoxTimeout){
+      clearTimeout(this.tooleBoxTimeout);
+    }
+    this.state.uiShownToolBox || this.setState({uiShownToolBox: true});
+    this.tooleBoxTimeout = setTimeout(() => {
+      this.setState({uiShownToolBox: false})
+    }, 5000);
   }
 
   tooglePlayPause(){ 
     this.player.tooglePlayPause(this.state.currentUrl);
+    this.setState({
+      ended: false
+    })
   }
 
   mute(){
@@ -85,13 +100,32 @@ export default class Main extends Component<any, MainState> {
 
   onEndReached(){
     this.player.position = 0;
+    this.setState({
+      position: 0,
+      buffer: 0,
+      playing: false,
+      ended: true
+    });
+  }
+
+  seeking(position: number){
+    this.player.position = position;
   }
 
   render() {
+    let overlayState: OverlayControlesDisplayState = OverlayControlesDisplayState.PLAY;
+    if(this.state.playing){
+      overlayState = OverlayControlesDisplayState.PAUSE
+    }
+    if(this.state.ended){
+      overlayState = OverlayControlesDisplayState.REPLAY;
+    }
     return (
-      <div onMouseMove={()=>this.hover()}>
-        <Player ref={(player) => this.player = player } style={this.styles.player}
-          onPositionChanged={(pos: number)=>this.setState({position: pos * 100})}
+      <div onMouseMove={()=>this.mouseMove()}>
+        <Player 
+          style={this.styles.player}
+          ref={(player) => this.player = player } 
+          onPositionChanged={(pos: number)=>this.setState({position: pos })}
           onBuffering={(perc: number)=>this.setState({buffer: perc})}
           onPlaying={()=>this.setState({playing:true})}
           onPaused={()=>this.setState({playing:false})}
@@ -99,16 +133,20 @@ export default class Main extends Component<any, MainState> {
           onEndReached={()=>this.onEndReached()}
           />
         <Toolbox style={this.styles.toolbox} 
-          shown={this.state.uiShown}
+          shown={this.state.uiShownToolBox}
           >
             <Header />
             <OverlayControles
               onClick={()=>this.tooglePlayPause()}
-              displayState={this.state.playing ? OverlayControlesDisplayState.PAUSE : OverlayControlesDisplayState.PLAY}
+              displayState={overlayState}
               />
           </Toolbox>
-          <Controles shown={this.state.uiShown}> 
-              <ProgressBar position={this.state.position} buffer={this.state.buffer} />
+          <Controles shown={this.state.uiShownControle}> 
+              <ProgressBar 
+                position={this.state.position} 
+                buffer={this.state.buffer}
+                onSeek={(position)=>this.seeking(position)}
+                />
               <PlayPause style={{display:'inline-block'}}
                 onClick={()=>this.tooglePlayPause()}
                 displayState={this.state.playing ? PlayPauseDisplayState.PAUSE : PlayPauseDisplayState.PLAY}

@@ -3,11 +3,14 @@ import * as React from 'react';
 import {Component} from 'react';
 
 import PlayCircleFilled from 'material-ui/svg-icons/av/play-circle-filled';
+import PlayCircleOutline from 'material-ui/svg-icons/av/play-circle-outline';
 import PauseCircleFilled from 'material-ui/svg-icons/av/pause-circle-filled';
+import PauseCircleOutline from 'material-ui/svg-icons/av/pause-circle-outline';
+import Replay from 'material-ui/svg-icons/av/replay';
 
 
 interface OverlayControlesState{
-
+  over:boolean
 }
 
 interface OverlayControlesProps extends React.HTMLProps<HTMLDivElement>{
@@ -16,7 +19,8 @@ interface OverlayControlesProps extends React.HTMLProps<HTMLDivElement>{
 
 export enum OverlayControlesDisplayState{
   PLAY,
-  PAUSE
+  PAUSE,
+  REPLAY
 }
 
 export default class OverlayControles extends Component<OverlayControlesProps, OverlayControlesState> {
@@ -35,19 +39,42 @@ export default class OverlayControles extends Component<OverlayControlesProps, O
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      over:false
+    };
   
   }
 
+  mouseOver(){
+    this.setState({over:true})
+  }
+
+  mouseLeave(){
+    this.setState({over:false})
+  }
+
   render() {
+
+    let OverlayIco;
+
+    switch(this.props.displayState ){
+      case OverlayControlesDisplayState.PLAY:
+        OverlayIco = this.state.over ? PlayCircleFilled : PlayCircleOutline;
+      break;
+      case OverlayControlesDisplayState.PAUSE:
+        OverlayIco = this.state.over ? PauseCircleFilled : PauseCircleOutline;
+      break;
+      case OverlayControlesDisplayState.REPLAY:
+        OverlayIco = Replay;
+      break;
+    }
+    
     return (
-      <div onClick={(e)=>this.props.onClick(e)} >
-        {this.props.displayState === OverlayControlesDisplayState.PLAY ?
-          <PlayCircleFilled style={this.style} />
-          :
-          <PauseCircleFilled style={this.style} />
-        }
-      </div>
+          <OverlayIco 
+            style={this.style}
+            onMouseOver={()=>this.mouseOver()} 
+            onMouseLeave={()=>this.mouseLeave()}
+            onClick={(e)=>this.props.onClick(e)} />
     );
   }
 }

@@ -95,7 +95,12 @@ export default class Volume extends Component<VolumeProps, VolumeState> {
             transition: 'width 1s linear',
             overflow: 'auto'
           }} 
-          sliderStyle={{marginTop:'3px', marginBottom:"0px", marginLeft:'6px', width:'calc(100% - 23px)'}} />
+          sliderStyle={{
+            marginTop:'3px', 
+            marginBottom:"0px", 
+            marginLeft:'6px', 
+            width:'calc(100% - 23px)'
+          }} />
       </div>
     );
   }

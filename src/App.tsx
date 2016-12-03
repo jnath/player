@@ -52,6 +52,7 @@ export default class Main extends Component<any, MainState> {
 
     this.state = {
       uiShownToolBox: true,
+      uiShownControle: true,
       playing: false,
       ended: false,
       currentUrl: 'file:///Users/jnath2/Movies/trailer_1080p.mov',
@@ -121,7 +122,9 @@ export default class Main extends Component<any, MainState> {
       overlayState = OverlayControlesDisplayState.REPLAY;
     }
     return (
-      <div onMouseMove={()=>this.mouseMove()}>
+      <div 
+        // onMouseMove={()=>this.mouseMove()}
+        >
         <Player 
           style={this.styles.player}
           ref={(player) => this.player = player } 
@@ -139,6 +142,8 @@ export default class Main extends Component<any, MainState> {
             <OverlayControles
               onClick={()=>this.tooglePlayPause()}
               displayState={overlayState}
+              hiddenTimer={ 2000 }
+              enableHiddenTimer={this.state.playing}
               />
           </Toolbox>
           <Controles shown={this.state.uiShownControle}> 

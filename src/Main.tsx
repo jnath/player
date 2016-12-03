@@ -27,6 +27,14 @@ const muiTheme = getMuiTheme({
   },
   svgIcon:{
     color: colors.grey500,
+  },
+  slider:{
+    selectionColor: colors.grey500,
+    trackColorSelected: colors.grey800,
+    handleColorZero: colors.grey900,
+    handleFillColor: colors.grey900,
+    rippleColor: colors.red900,
+    handleSizeActive:15
   }
 });
 

@@ -10,11 +10,14 @@ import Replay from 'material-ui/svg-icons/av/replay';
 
 
 interface OverlayControlesState{
-  over:boolean
+  visible?:boolean
+  over?:boolean
 }
 
 interface OverlayControlesProps extends React.HTMLProps<HTMLDivElement>{
-  displayState:OverlayControlesDisplayState
+  displayState:OverlayControlesDisplayState;
+  hiddenTimer:number;
+  enableHiddenTimer: boolean;
 }
 
 export enum OverlayControlesDisplayState{
@@ -24,6 +27,8 @@ export enum OverlayControlesDisplayState{
 }
 
 export default class OverlayControles extends Component<OverlayControlesProps, OverlayControlesState> {
+
+  private timeout: NodeJS.Timer;
 
   style: any = {
     width: '100px',
@@ -40,6 +45,7 @@ export default class OverlayControles extends Component<OverlayControlesProps, O
     super(props);
 
     this.state = {
+      visible:true,
       over:false
     };
   
@@ -47,15 +53,31 @@ export default class OverlayControles extends Component<OverlayControlesProps, O
 
   mouseOver(){
     this.setState({over:true})
+    if(this.timeout){
+      clearTimeout(this.timeout);
+    }
+    this.setState({ visible: true });
   }
 
   mouseLeave(){
     this.setState({over:false})
+    if(this.props.hiddenTimer && this.props.hiddenTimer > 0){
+      this.timeout = setTimeout(() => {
+        this.setState({ visible: false });    
+      }, this.props.hiddenTimer);
+    }
   }
 
   render() {
 
     let OverlayIco;
+
+    if(!this.props.enableHiddenTimer){
+      if(this.timeout){
+        clearTimeout(this.timeout);
+      }
+      this.state.visible = true;
+    }
 
     switch(this.props.displayState ){
       case OverlayControlesDisplayState.PLAY:
@@ -68,7 +90,7 @@ export default class OverlayControles extends Component<OverlayControlesProps, O
         OverlayIco = Replay;
       break;
     }
-    
+    this.style.opacity = this.state.visible ? '1':'0';
     return (
           <OverlayIco 
             style={this.style}

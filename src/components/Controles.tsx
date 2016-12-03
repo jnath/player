@@ -42,7 +42,7 @@ export default class Controles extends Component<ControlesProps, ControlesState>
         onMouseLeave={()=>this.mouseLeave()} 
         style={{
           width: '100%',
-          height: this.state.open ? '30px' : '4px',
+          height: this.state.open ? '40px' : '8px',
           position: 'absolute',
           bottom: 0,
           left: 0,
